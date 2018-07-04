@@ -115,9 +115,9 @@ if ~cohflag, subplot(2,1,1);
 elseif cohflag, subplot(3,1,1); end
 for k = 1:1:N
     if strcmp(option.foption, 'log')
-        h = semilogx(data{k}.sys.frequency,dbm(squeeze(data{k}.sys.ResponseData))); hold on;
+        h = semilogx(data{k}.sys.frequency,mag2db(abs(squeeze(data{k}.sys.ResponseData)))); hold on;
     else
-        h = plot(data{k}.sys.frequency,dbm(squeeze(data{k}.sys.ResponseData))); hold on;
+        h = plot(data{k}.sys.frequency,mag2db(abs(squeeze(data{k}.sys.ResponseData)))); hold on;
     end
     try set(h,'Color',data{k}.color); catch, end
     try set(h,'linestyle',data{k}.style); catch, end
