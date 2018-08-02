@@ -1,4 +1,4 @@
-function pfig = pltNyquist(in,option)
+function [pfig, hfig] = pltNyquist(in,option)
 %pltNyquist - plot Nyquist diagram
 %
 % pfig = pltNyquist(in,option)
@@ -41,18 +41,17 @@ for k = 1:1:N
     try data{k}.sys = in{k}.sys; data{k} = in{k}; catch, data{k}.sys = in{k}; end
     
     % fdel
-    if ~isfield(option,'fmin')
+    if isfield(option,'fmin')
         [~,kmin] = min(data{k}.sys.freq - option.fmin);
         freqdel = data{k}.sys.freq(1:kmin);
         fprintf('freqs from %.1f Hz to %.1fHz deleted\n',data{k}.sys.freq(1),data{k}.sys.freq(kmin));
         data{k}.sys = fdel(data{k}.sys,freqdel);
     end
-    try option.fmax;
+    if isfield(option,'fmax')
         kmax = knnsearch(data{k}.sys.freq,option.fmax);
         freqdel = data{k}.sys.freq(kmax:end);
         fprintf('freqs from %.1f Hz to %.1fHz deleted\n',data{k}.sys.freq(kmax),data{k}.sys.freq(end));
         data{k}.sys = fdel(data{k}.sys,freqdel);
-    catch
     end
 end
 

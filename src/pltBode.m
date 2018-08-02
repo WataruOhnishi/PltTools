@@ -1,4 +1,4 @@
-function pfig = pltBode(in,option,cohflag)
+function [pfig, hfig] = pltBode(in,option,cohflag)
 %pltBode - plot Bode diagram
 %
 % pfig = pltBode(in,option)
