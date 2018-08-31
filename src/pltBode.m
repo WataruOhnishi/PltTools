@@ -73,6 +73,7 @@ if ~isfield(option,'ptick'), option.ptick = 90; end
 if ~isfield(option,'foption'), option.foption = 'log'; end
 if ~isfield(option,'Legpos'), option.Legpos = 'gain'; end
 if ~isfield(option,'LegendLoc'), option.LegendLoc = 'best'; end
+if ~isfield(option,'phasePlot'), option.phasePlot = 1:length(in); end
 
 freq = logspace(log10(option.fmin),log10(option.fmax),1000);
 colorlist = {'b','r','k','m','g','c','g2','b2','b3'};
@@ -133,7 +134,7 @@ try title(option.title); catch, end
 
 if ~cohflag, subplot(2,1,2);
 elseif cohflag, subplot(3,1,2); end
-for k = 1:1:N
+for k = option.phasePlot
     temp = phs(squeeze(data{k}.sys));
     phasedeg = squeeze(temp.ResponseData);
     for kk = 1:1:length(phasedeg)
