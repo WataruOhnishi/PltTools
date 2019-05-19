@@ -112,8 +112,8 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 hfig = figure;
-if ~cohflag, subplot(2,1,1);
-elseif cohflag, subplot(3,1,1); end
+if ~cohflag, ax1 = subplot(2,1,1);
+elseif cohflag, ax1 = subplot(3,1,1); end
 for k = 1:1:N
     if strcmp(option.foption, 'log')
         h = semilogx(data{k}.sys.frequency,mag2db(abs(squeeze(data{k}.sys.ResponseData)))); hold on;
@@ -122,7 +122,7 @@ for k = 1:1:N
     end
     try set(h,'Color',data{k}.color); catch, end
     try set(h,'linestyle',data{k}.style); catch, end
-    try set(h,'Marker',data{k}.marker); catch, end 
+    try set(h,'Marker',data{k}.marker); catch, end
 end
 axis([option.fmin, option.fmax, option.gmin, option.gmax]);
 set(gca,'ytick',option.gmin:option.gtick:option.gmax);
@@ -132,11 +132,10 @@ grid on; hold on;
 try title(option.title); catch, end
 
 
-if ~cohflag, subplot(2,1,2);
-elseif cohflag, subplot(3,1,2); end
+if ~cohflag, ax2 = subplot(2,1,2);
+elseif cohflag, ax2 = subplot(3,1,2); end
 for k = option.phasePlot
-    temp = phs(squeeze(data{k}.sys));
-    phasedeg = squeeze(temp.ResponseData);
+    phasedeg = rad2deg(angle(squeeze(data{k}.sys.ResponseData)));
     for kk = 1:1:length(phasedeg)
         while phasedeg(kk) > option.pmax
             phasedeg(kk) = phasedeg(kk) - 360;
@@ -148,6 +147,10 @@ for k = option.phasePlot
     
     if strcmp(option.foption, 'log')
         h = semilogx(data{k}.sys.frequency,phasedeg); hold on;
+        if strcmp(data{k}.style,'')
+            scatter(data{k}.sys.frequency,phasedeg);
+            set(gca,'xscale','log');
+        end
     else
         h = plot(data{k}.sys.frequency,phasedeg); hold on;
     end
@@ -163,9 +166,9 @@ ylabel('Phase [deg]');
 if strcmp(option.Legpos,'phase'), multiLegend(data); end
 grid on; hold on;
 
-if cohflag, subplot(3,1,3);
+if cohflag, ax3 = subplot(3,1,3);
     for k = 1:1:N
-        if isempty(data{k}.sys.UserData), error('No coherence data'); end 
+        if isempty(data{k}.sys.UserData), error('No coherence data'); end
         if strcmp(option.foption, 'log')
             h = semilogx(data{k}.sys.frequency,data{k}.sys.UserData); hold on;
         else
@@ -181,6 +184,10 @@ if cohflag, subplot(3,1,3);
     ylabel('Coherence [-]');
     grid on; hold on;
 end
+
+if ~cohflag, linkaxes([ax1,ax2],'x');
+elseif cohflag, linkaxes([ax1,ax2,ax3],'x'); end
+
 
 pfig = pubfig(hfig);
 pfig.LegendLoc = option.LegendLoc;
