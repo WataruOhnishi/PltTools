@@ -116,13 +116,20 @@ if ~cohflag, ax1 = subplot(2,1,1);
 elseif cohflag, ax1 = subplot(3,1,1); end
 for k = 1:1:N
     if strcmp(option.foption, 'log')
-        h = semilogx(data{k}.sys.frequency,mag2db(abs(squeeze(data{k}.sys.ResponseData)))); hold on;
+        if strcmp(data{k}.style,'')
+            h = scatter(data{k}.sys.frequency,mag2db(abs(squeeze(data{k}.sys.ResponseData))),'filled','o'); hold on
+            set(h,'MarkerEdgeColor',data{k}.color);
+            set(h,'MarkerFaceColor',data{k}.color);
+            set(gca,'xscale','log');
+        else
+            h = semilogx(data{k}.sys.frequency,mag2db(abs(squeeze(data{k}.sys.ResponseData)))); hold on;
+            try set(h,'Color',data{k}.color); catch, end
+            try set(h,'linestyle',data{k}.style); catch, end
+            try set(h,'Marker',data{k}.marker); catch, end
+        end
     else
         h = plot(data{k}.sys.frequency,mag2db(abs(squeeze(data{k}.sys.ResponseData)))); hold on;
     end
-    try set(h,'Color',data{k}.color); catch, end
-    try set(h,'linestyle',data{k}.style); catch, end
-    try set(h,'Marker',data{k}.marker); catch, end
 end
 axis([option.fmin, option.fmax, option.gmin, option.gmax]);
 set(gca,'ytick',option.gmin:option.gtick:option.gmax);
@@ -146,18 +153,21 @@ for k = option.phasePlot
     end
     
     if strcmp(option.foption, 'log')
-        h = semilogx(data{k}.sys.frequency,phasedeg); hold on;
         if strcmp(data{k}.style,'')
-            scatter(data{k}.sys.frequency,phasedeg);
+            h = scatter(data{k}.sys.frequency,phasedeg,'filled','o'); hold on
+            set(h,'MarkerEdgeColor',data{k}.color);
+            set(h,'MarkerFaceColor',data{k}.color);
             set(gca,'xscale','log');
+        else
+            h = semilogx(data{k}.sys.frequency,phasedeg); hold on;
+            try set(h,'Color',data{k}.color); catch, end
+            try set(h,'linestyle',data{k}.style); catch, end
+            try set(h,'Marker',data{k}.marker); catch, end
         end
     else
         h = plot(data{k}.sys.frequency,phasedeg); hold on;
     end
     
-    try set(h,'Color',data{k}.color); catch, end
-    try set(h,'linestyle',data{k}.style); catch, end
-    try set(h,'Marker',data{k}.marker); catch, end
 end
 axis([option.fmin, option.fmax, option.pmin, option.pmax]);
 set(gca,'ytick',option.pmin:option.ptick:option.pmax);
