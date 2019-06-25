@@ -125,11 +125,18 @@ hm = plot(-1,0,'kx');
 set(hm,'MarkerSize',12);
 try title(option.title); catch, end
 
-try 
+if isfield(option,'gmdb')
+    option
     [sigma, rm] = stabCircle(option.gmdb,option.pmdeg);
     [xstab,ystab] = circle(-sigma,0,rm);
     plot(xstab,ystab,'k:');
-catch, end
+end
+if isfield(option,'Smax_dB')
+    [xSmax,ySmax] = circle(-1,0,1/(db2mag(option.Smax_dB)));
+    plot(xSmax,ySmax,'k--');
+end
+
+
 
 multiLegend(data);
 
