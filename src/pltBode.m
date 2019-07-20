@@ -79,7 +79,10 @@ freq = logspace(log10(option.fmin),log10(option.fmax),1000);
 colorlist = {'b','r','k','m','g','c','g2','b2','b3'};
 for k = 1:1:N
     % convert to FRD
-    try data{k}.sys.ResponseData; catch, data{k}.sys = frd(data{k}.sys,freq,'Hz'); end
+    try data{k}.sys.ResponseData; catch 
+        [mag,phase,w] = bode(data{k}.sys,freq*2*pi);
+        data{k}.sys = frd(squeeze(mag).*exp(1j*deg2rad(squeeze(phase))),w/2/pi,'FrequencyUnit','Hz'); 
+    end
     
     if (strcmp(data{k}.sys.FrequencyUnit,'rad/s') == 1)
         data{k}.sys.Frequency = data{k}.sys.Frequency/2/pi;

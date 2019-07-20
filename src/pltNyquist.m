@@ -19,6 +19,7 @@ function [pfig, hfig] = pltNyquist(in,option)
 %   option.title = '';  % title
 %   option.gmdb = 6;    % gain margin for circle condition
 %   option.pmdeg = 30;  % phase margin for circle condition
+%   option.Smax_dB = 6;  % max of sensitivity function
 
 % Advanced options
 %   data1.P         : plant model
@@ -126,7 +127,6 @@ set(hm,'MarkerSize',12);
 try title(option.title); catch, end
 
 if isfield(option,'gmdb')
-    option
     [sigma, rm] = stabCircle(option.gmdb,option.pmdeg);
     [xstab,ystab] = circle(-sigma,0,rm);
     plot(xstab,ystab,'k:');
