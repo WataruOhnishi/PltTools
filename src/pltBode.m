@@ -103,13 +103,14 @@ for k = 1:1:N
 end
 
 if ~isfield(option,'gmin')
-    option.gtick = 20;
-    option.gmin = floor(mag2db(min(abs(data{1}.sys.ResponseData)))/option.gtick)*option.gtick;
-    option.gmax = ceil(mag2db(max(abs(data{1}.sys.ResponseData)))/option.gtick)*option.gtick;
-    for k = 1:1:N
-        option.gmin = min(option.gmin,floor(mag2db(min(abs(data{k}.sys.ResponseData)))/option.gtick)*option.gtick);
-        option.gmax = max(option.gmax,ceil(mag2db(max(abs(data{k}.sys.ResponseData)))/option.gtick)*option.gtick);
+    h = figure;
+    for k = 1:N
+        bode(data{k}.sys); hold on
     end
+    option.gmin = h.Children(3).YLim(1);
+    option.gmax = h.Children(3).YLim(end);
+    option.gtick = h.Children(3).YTick(2)-h.Children(3).YTick(1);
+    close(h);
 end
 
 

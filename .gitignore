@@ -49,3 +49,4 @@ $RECYCLE.BIN/				# Recycle Bin used on file shares
 .TemporaryItems
 .Trashes
 .VolumeIcon.icns
+*.asv
