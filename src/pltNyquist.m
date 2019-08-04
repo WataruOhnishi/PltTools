@@ -49,7 +49,7 @@ for k = 1:1:N
         data{k}.sys = fdel(data{k}.sys,freqdel);
     end
     if isfield(option,'fmax')
-        kmax = knnsearch(data{k}.sys.freq,option.fmax);
+        [~,kmax] = min(data{k}.sys.freq - option.fmax);
         freqdel = data{k}.sys.freq(kmax:end);
         fprintf('freqs from %.1f Hz to %.1fHz deleted\n',data{k}.sys.freq(kmax),data{k}.sys.freq(end));
         data{k}.sys = fdel(data{k}.sys,freqdel);
@@ -122,8 +122,6 @@ ylim([option.ymin,option.ymax]);
 
 plot(uc_x,uc_y,'k--');
 plot([0,0],[min(-2,option.ymin),max(2,option.ymax)],'k-'); plot([min(-2,option.xmin),max(2,option.xmax)],[0,0],'k-'); % real and imag axes
-hm = plot(-1,0,'kx');
-set(hm,'MarkerSize',12);
 try title(option.title); catch, end
 
 if isfield(option,'gmdb')
@@ -133,12 +131,18 @@ if isfield(option,'gmdb')
 end
 if isfield(option,'Smax_dB')
     [xSmax,ySmax] = circle(-1,0,1/(db2mag(option.Smax_dB)));
-    plot(xSmax,ySmax,'k--');
+    plot(xSmax,ySmax,'k-.');
 end
 
-
+if isfield(option,'gmpmdot')
+    if option.gmpmdot == true
+        plot(-sigma,0,'ko','MarkerFaceColor','k');
+    end
+end
+plot(-1,0,'ko','MarkerFaceColor','k');
 
 multiLegend(data);
 
 pfig = pubfig(hfig);pfig.Grid = 'off';
 pfig.LegendLoc = 'southeast';
+pfig.MarkerSize(1) = 8;

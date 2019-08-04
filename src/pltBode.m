@@ -79,9 +79,9 @@ freq = logspace(log10(option.fmin),log10(option.fmax),1000);
 colorlist = {'b','r','k','m','g','c','g2','b2','b3'};
 for k = 1:1:N
     % convert to FRD
-    try data{k}.sys.ResponseData; catch 
+    try data{k}.sys.ResponseData; catch
         [mag,phase,w] = bode(data{k}.sys,freq*2*pi);
-        data{k}.sys = frd(squeeze(mag).*exp(1j*deg2rad(squeeze(phase))),w/2/pi,'FrequencyUnit','Hz'); 
+        data{k}.sys = frd(squeeze(mag).*exp(1j*deg2rad(squeeze(phase))),w/2/pi,'FrequencyUnit','Hz');
     end
     
     if (strcmp(data{k}.sys.FrequencyUnit,'rad/s') == 1)
@@ -180,17 +180,30 @@ ylabel('Phase [deg]');
 if strcmp(option.Legpos,'phase'), multiLegend(data); end
 grid on; hold on;
 
+
+
 if cohflag, ax3 = subplot(3,1,3);
     for k = 1:1:N
-        if isempty(data{k}.sys.UserData), error('No coherence data'); end
-        if strcmp(option.foption, 'log')
-            h = semilogx(data{k}.sys.frequency,data{k}.sys.UserData); hold on;
+        if ~isempty(data{k}.sys.UserData)
+            if strcmp(option.foption, 'log')
+                if strcmp(data{k}.style,'')
+                    hc = scatter(data{k}.sys.frequency,data{k}.sys.UserData,'filled','o'); hold on
+                    set(hc,'MarkerEdgeColor',data{k}.color);
+                    set(hc,'MarkerFaceColor',data{k}.color);
+                    set(gca,'xscale','log');
+                else
+                    hc = semilogx(data{k}.sys.frequency,data{k}.sys.UserData); hold on;
+                end
+            else
+                hc = plot(data{k}.sys.frequency,data{k}.sys.UserData); hold on;
+            try set(hc,'Color',data{k}.color); catch, end
+            try set(hc,'linestyle',data{k}.style); catch, end
+            try set(hc,'Marker',data{k}.marker); catch, end
+            end
         else
-            h = plot(data{k}.sys.frequency,data{k}.sys.UserData); hold on;
+            % for bug for scatter
+            hc = plot(data{k}.sys.freq(1)/10,2);
         end
-        try set(h,'Color',data{k}.color); catch, end
-        try set(h,'linestyle',data{k}.style); catch, end
-        try set(h,'Marker',data{k}.marker); catch, end
     end
     axis([option.fmin, option.fmax, 0, 1]);
     set(gca,'ytick',0:0.2:1);
@@ -205,5 +218,5 @@ elseif cohflag, linkaxes([ax1,ax2,ax3],'x'); end
 
 pfig = pubfig(hfig);
 pfig.LegendLoc = option.LegendLoc;
-if cohflag, pfig.FigDim = [19,16]; end
+if cohflag, pfig.Dimension = [19,16]; end
 
