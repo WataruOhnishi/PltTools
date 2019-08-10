@@ -37,20 +37,37 @@ if nargin < 2
 end
 
 data = cell(1,N); % to accept pltNyquist(tf(1)) or pltNyquist({tf(1)})
+try option.xmin; catch, option.xmin = -1.5; option.xtick = 0.5; option.xmax = 1; end
+try option.ymin; catch, option.ymin = -1.5; option.ytick = 0.5; option.ymax = 1; end
+try option.fmin; catch, option.fmin = 0.1; option.fmax = 1e4; end
+freq = logspace(log10(option.fmin),log10(option.fmax),3000);
+
 for k = 1:1:N
     if ~iscell(in), in = {in}; end
     try data{k}.sys = in{k}.sys; data{k} = in{k}; catch, data{k}.sys = in{k}; end
-    
+    try data{k}.sys.ResponseData;
+    catch
+        % if data is not frd, disp isstable
+        Gcl = feedback(data{k}.sys,1);
+        try
+            if isstable(Gcl) == 0
+                fprintf('data{%d} is unstable\n',k);
+            end
+        catch
+        end
+        data{k}.sys = frd(data{k}.sys,freq,'Hz');
+    end
+        
     % fdel
     if isfield(option,'fmin')
-        [~,kmin] = min(data{k}.sys.freq - option.fmin);
-        freqdel = data{k}.sys.freq(1:kmin);
+        [~,kmin] = min(abs(data{k}.sys.freq - option.fmin));
+        freqdel = data{k}.sys.freq(1:kmin-1);
         fprintf('freqs from %.1f Hz to %.1fHz deleted\n',data{k}.sys.freq(1),data{k}.sys.freq(kmin));
         data{k}.sys = fdel(data{k}.sys,freqdel);
     end
     if isfield(option,'fmax')
-        [~,kmax] = min(data{k}.sys.freq - option.fmax);
-        freqdel = data{k}.sys.freq(kmax:end);
+        [~,kmax] = min(abs(data{k}.sys.freq - option.fmax));
+        freqdel = data{k}.sys.freq(kmax+1:end);
         fprintf('freqs from %.1f Hz to %.1fHz deleted\n',data{k}.sys.freq(kmax),data{k}.sys.freq(end));
         data{k}.sys = fdel(data{k}.sys,freqdel);
     end
@@ -62,11 +79,6 @@ for k = 1:1:N
     if strcmp(option.plot,'Gop'), data{k}.sys = data{k}.P*data{k}.Cfb*data{k}.Csh; end
 end
 
-try option.xmin; catch, option.xmin = -1.5; option.xtick = 0.5; option.xmax = 1; end
-try option.ymin; catch, option.ymin = -1.5; option.ytick = 0.5; option.ymax = 1; end
-
-try option.fmin; catch, option.fmin = 0.1; option.fmax = 1e4; end
-freq = logspace(log10(option.fmin),log10(option.fmax),3000);
 
 uc_point = 1e3;
 uc_x = zeros(1,uc_point);
@@ -83,18 +95,7 @@ for k = 1:1:N
 end
 
 for k = 1:1:N
-    try data{k}.sys.ResponseData;
-    catch
-        % if data is not frd, disp isstable
-        Gcl = feedback(data{k}.sys,1);
-        try
-            if isstable(Gcl) == 0
-                fprintf('data{%d} is unstable\n',k);
-            end
-        catch
-        end
-        data{k}.sys = frd(data{k}.sys,freq,'Hz');
-    end
+    
     
     try data{k}.style; catch, data{k}.style = '-'; end
     
