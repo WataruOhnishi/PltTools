@@ -75,6 +75,23 @@ if ~isfield(option,'Legpos'), option.Legpos = 'gain'; end
 if ~isfield(option,'LegendLoc'), option.LegendLoc = 'best'; end
 if ~isfield(option,'phasePlot'), option.phasePlot = 1:length(in); end
 
+if isfield(option,'m')
+    s = tf('s');
+    data_con.sys = (s/option.wc)^option.m;
+    data_con.name = 'constraint';
+    data_con.color = 'k';
+    data_con.style = '--';
+    data = [data,data_con];
+end
+if isfield(option,'Smax')
+    data_con2.sys = option.Smax;
+    data_con2.name = 'constraint';
+    data_con2.color = 'k';
+    data_con2.style = ':';
+    data = [data,data_con2];
+end
+N = length(data);
+
 freq = logspace(log10(option.fmin),log10(option.fmax),1000);
 colorlist = {'b','r','k','m','g','c','g2','b2','b3'};
 for k = 1:1:N

@@ -57,7 +57,7 @@ for k = 1:1:N
         end
         data{k}.sys = frd(data{k}.sys,freq,'Hz');
     end
-        
+    
     % fdel
     if isfield(option,'fmin')
         [~,kmin] = min(abs(data{k}.sys.freq - option.fmin));
@@ -130,9 +130,19 @@ if isfield(option,'gmdb')
     [xstab,ystab] = circle(-sigma,0,rm);
     plot(xstab,ystab,'k:');
 end
-if isfield(option,'Smax_dB')
-    [xSmax,ySmax] = circle(-1,0,1/(db2mag(option.Smax_dB)));
-    plot(xSmax,ySmax,'k-.');
+if isfield(option,'Smax')
+    % find unique Smax
+    if ~isfield(option.Smax,'ResponseData')
+        option.Smax = frd(option.Smax,data{1}.sys.freq,'FrequencyUnit',data{1}.sys.FrequencyUnit);
+    end
+    Smax_gain = squeeze(option.Smax.ResponseData);
+    Smax_array = Smax_gain(1);
+    idx = find(diff(Smax_gain));
+    Smax_array = [Smax_array;Smax_array(idx+1);];
+    for k = 1:length(Smax_array)
+        [xSmax,ySmax] = circle(-1,0,1/Smax_array(k));
+        plot(xSmax,ySmax,'k-.');
+    end
 end
 
 if isfield(option,'gmpmdot')
@@ -142,8 +152,17 @@ if isfield(option,'gmpmdot')
 end
 plot(-1,0,'ko','MarkerFaceColor','k');
 
+% re-plot for overwrite
+for k = 1:1:N
+    h = plot(squeeze(data{k}.re),squeeze(data{k}.im)); hold on;
+    set(h,'Color',data{k}.color);
+    try set(h,'linestyle',data{k}.style); catch, end
+    try set(h,'Marker',data{k}.marker); catch, end
+end
+
+
 multiLegend(data);
 
 pfig = pubfig(hfig);pfig.Grid = 'off';
 pfig.LegendLoc = 'southeast';
-pfig.MarkerSize(1) = 8;
+pfig.MarkerSize(N+1) = 8;
