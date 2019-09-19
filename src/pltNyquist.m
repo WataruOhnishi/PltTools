@@ -121,7 +121,7 @@ set(gca,'ytick',option.ymin:option.ytick:option.ymax);
 xlim([option.xmin,option.xmax]);
 ylim([option.ymin,option.ymax]);
 
-plot(uc_x,uc_y,'k--');
+plot(uc_x,uc_y,'k:');
 plot([0,0],[min(-2,option.ymin),max(2,option.ymax)],'k-'); plot([min(-2,option.xmin),max(2,option.xmax)],[0,0],'k-'); % real and imag axes
 try title(option.title); catch, end
 
