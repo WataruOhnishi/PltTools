@@ -74,6 +74,7 @@ if ~isfield(option,'foption'), option.foption = 'log'; end
 if ~isfield(option,'Legpos'), option.Legpos = 'gain'; end
 if ~isfield(option,'LegendLoc'), option.LegendLoc = 'best'; end
 if ~isfield(option,'phasePlot'), option.phasePlot = 1:length(in); end
+if ~isfield(option,'freq'), freq = logspace(log10(option.fmin),log10(option.fmax),1000); else, freq = option.freq; end
 
 if isfield(option,'m')
     s = tf('s');
@@ -92,7 +93,6 @@ if isfield(option,'Smax')
 end
 N = length(data);
 
-freq = logspace(log10(option.fmin),log10(option.fmax),1000);
 colorlist = {'b','r','k','m','g','c','g2','b2','b3'};
 for k = 1:1:N
     % convert to FRD
