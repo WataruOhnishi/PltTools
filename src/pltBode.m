@@ -1,4 +1,4 @@
-function [pfig, hfig] = pltBode(in,option,cohflag)
+function [pfig, hfig, ax] = pltBode(in,option,cohflag)
 %pltBode - plot Bode diagram
 %
 % pfig = pltBode(in,option)
@@ -133,11 +133,11 @@ if ~isfield(option,'gmin')
     close(h);
 end
 
-
+ax = nan;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 hfig = figure;
-if ~cohflag, ax1 = subplot(2,1,1);
-elseif cohflag, ax1 = subplot(3,1,1); end
+if ~cohflag, ax(1) = subplot(2,1,1);
+elseif cohflag, ax(1) = subplot(3,1,1); end
 for k = 1:1:N
     if strcmp(option.foption, 'log')
         if strcmp(data{k}.style,'')
@@ -163,8 +163,8 @@ grid on; hold on;
 try title(option.title); catch, end
 
 
-if ~cohflag, ax2 = subplot(2,1,2);
-elseif cohflag, ax2 = subplot(3,1,2); end
+if ~cohflag, ax(2) = subplot(2,1,2);
+elseif cohflag, ax(2) = subplot(3,1,2); end
 for k = option.phasePlot
     phasedeg = rad2deg(angle(squeeze(data{k}.sys.ResponseData)));
     for kk = 1:1:length(phasedeg)
@@ -202,7 +202,7 @@ grid on; hold on;
 
 
 
-if cohflag, ax3 = subplot(3,1,3);
+if cohflag, ax(3) = subplot(3,1,3);
     for k = 1:1:N
         if ~isempty(data{k}.sys.UserData)
             if strcmp(option.foption, 'log')
@@ -232,9 +232,9 @@ if cohflag, ax3 = subplot(3,1,3);
     grid on; hold on;
 end
 
-if ~cohflag, linkaxes([ax1,ax2],'x');
-elseif cohflag, linkaxes([ax1,ax2,ax3],'x'); end
-
+% if ~cohflag, linkaxes([ax1,ax2],'x');
+% elseif cohflag, linkaxes([ax1,ax2,ax3],'x'); end
+linkaxes(ax,'x');
 
 pfig = pubfig(hfig);
 pfig.LegendLoc = option.LegendLoc;
