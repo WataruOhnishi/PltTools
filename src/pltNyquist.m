@@ -19,7 +19,7 @@ function [pfig, hfig] = pltNyquist(in,option)
 %   option.title = '';  % title
 %   option.gmdb = 6;    % gain margin for circle condition
 %   option.pmdeg = 30;  % phase margin for circle condition
-%   option.Smax_dB = 6;  % max of sensitivity function
+%   option.Smax = 6;  % max of sensitivity function
 
 % Advanced options
 %   data1.P         : plant model
@@ -62,13 +62,17 @@ for k = 1:1:N
     if isfield(option,'fmin')
         [~,kmin] = min(abs(data{k}.sys.freq - option.fmin));
         freqdel = data{k}.sys.freq(1:kmin-1);
-        fprintf('freqs from %.1f Hz to %.1fHz deleted\n',data{k}.sys.freq(1),data{k}.sys.freq(kmin));
+        if data{k}.sys.freq(1) ~= data{k}.sys.freq(kmin)
+            fprintf('freqs from %.1f Hz to %.1fHz deleted\n',data{k}.sys.freq(1),data{k}.sys.freq(kmin));
+        end
         data{k}.sys = fdel(data{k}.sys,freqdel);
     end
     if isfield(option,'fmax')
         [~,kmax] = min(abs(data{k}.sys.freq - option.fmax));
         freqdel = data{k}.sys.freq(kmax+1:end);
-        fprintf('freqs from %.1f Hz to %.1fHz deleted\n',data{k}.sys.freq(kmax),data{k}.sys.freq(end));
+        if data{k}.sys.freq(kmax) ~= data{k}.sys.freq(end)
+            fprintf('freqs from %.1f Hz to %.1fHz deleted\n',data{k}.sys.freq(kmax),data{k}.sys.freq(end));
+        end
         data{k}.sys = fdel(data{k}.sys,freqdel);
     end
 end
