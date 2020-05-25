@@ -22,6 +22,7 @@ function [pfig, hfig] = pltBodemag(in,option)
 % Author    : Wataru Ohnishi, University of Tokyo, 2020
 %%%%%
 
+warning('obsolete! use pltBode')
 
 N = length(in);
 
