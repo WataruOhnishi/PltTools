@@ -20,6 +20,7 @@ function [pfig, hfig] = pltNyquist(in,option)
 %   option.gmdb = 6;    % gain margin for circle condition
 %   option.pmdeg = 30;  % phase margin for circle condition
 %   option.Smax = tf(2);  % max of sensitivity function
+%   option.multiFRDcolor = true;
 %
 % Author    : Wataru Ohnishi, University of Tokyo, 2017
 
@@ -43,7 +44,8 @@ pltSmax(data,option);
 p = plot(-1,0,'ko','MarkerFaceColor','k');
 set(get(get(p,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
 
-main_pltNyquist(data,N)
+colormap('lines');
+main_pltNyquist(data,N,option)
 multiLegend(data);
 
 xlabel('Real axis'); ylabel('Imaginary axis');
@@ -55,7 +57,7 @@ daspect([1,1,1]);
 
 pfig = pubfig(hfig); pfig.Grid = 'off';
 pfig.LegendLoc = 'southeast';
-pfig.MarkerSize(3) = 7;
+pfig.MarkerSize = 7;
 end
 
 
@@ -79,6 +81,7 @@ end
 function option = setoptions(data,option)
 if ~isfield(option,'xmin'), option.xmin = -1.5; option.xtick = 0.5; option.xmax = 1; end
 if ~isfield(option,'ymin'), option.ymin = -1.5; option.ytick = 0.5; option.ymax = 1; end
+if ~isfield(option,'multiFRDcolor'), option.multiFRDcolor = false; end    
 if ~isfield(option,'fmin')
     isfrd = false;
     freqtemp = [];
@@ -180,7 +183,7 @@ end
 end
 
 
-function main_pltNyquist(data,N)
+function main_pltNyquist(data,N,option)
 for k = 1:1:N
     if length(data{k}.sys) > 1
         data{k}.re = [];
@@ -189,7 +192,7 @@ for k = 1:1:N
             [re,im,~] = nyquist(data{k}.sys(:,:,kk));
             
             h = plot(squeeze(re),squeeze(im)); hold on;
-            set(h,'Color',data{k}.color);
+            if ~option.multiFRDcolor, set(h,'Color',data{k}.color); end
             try set(h,'linestyle',data{k}.style); catch, end
             try set(h,'Marker',data{k}.marker); catch, end
             if kk > 1, set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off'); end
