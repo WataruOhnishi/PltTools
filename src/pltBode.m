@@ -52,6 +52,7 @@ if ~option.noPhase
 else
     pltGain(data,option);
 end
+xlabel('Frequency [Hz]');
 
 
 if exist('pubfig','file')
@@ -227,7 +228,6 @@ for k = option.phasePlot
 end
 axis([option.fmin, option.fmax, option.pmin, option.pmax]);
 set(gca,'ytick',option.pmin:option.ptick:option.pmax);
-xlabel('Frequency [Hz]');
 ylabel('Phase [deg]');
 if strcmp(option.Legpos,'phase'), multiLegend(data); end
 grid on;
