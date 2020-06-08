@@ -236,7 +236,7 @@ if isfield(option,'Smax')
     Smax_array = [Smax_array;Smax_array(idx+1);];
     for k = 1:length(Smax_array)
         [xSmax,ySmax] = circle(-1,0,1/Smax_array(k));
-        p = plot(xSmax,ySmax,'k-.','HandleVisibility','off');
+        p = plot(xSmax,ySmax,'k-.');
         set(get(get(p,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
     end
 end

@@ -65,7 +65,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function data = iscellinput(in)
-N = length(in);
+if iscell(in), N = length(in); else, N = 1; end
 data = cell(1,N); % to accept pltBode(tf(1)) or pltBode({tf(1)})
 for k = 1:1:N
     if iscell(in) == 0
