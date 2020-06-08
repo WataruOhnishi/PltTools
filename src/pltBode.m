@@ -22,6 +22,7 @@ function [pfig, hfig, ax] = pltBode(in,option)
 %   option.Legpos   : legend in gain or phase plot 'gain' or 'phase'
 %   option.title = 'Bode plot'; % title
 %   option.noPhae = false;
+%   option.multiFRDcolor = true; % change color for multi frd
 % Author    : Wataru Ohnishi, University of Tokyo, 2017
 %%%%%
 
@@ -90,6 +91,7 @@ if ~isfield(option,'LegendLoc'), option.LegendLoc = 'best'; end
 if ~isfield(option,'phasePlot'), option.phasePlot = 1:length(data); end
 if ~isfield(option,'freq'), option.freq = logspace(log10(option.fmin),log10(option.fmax),1000); end
 if ~isfield(option,'noPhase'), option.noPhase = false; end
+if ~isfield(option,'multiFRDcolor'), option.multiFRDcolor = false; end
 end
 
 function [option,data] = setconstraints(data,option)
@@ -117,7 +119,7 @@ for k = 1:1:length(data)
     if isnumeric(data{k}.sys)
         data{k}.sys = tf(data{k}.sys);
     end
-%     if ~isfield(data{k}.sys,'ResponseData')
+    %     if ~isfield(data{k}.sys,'ResponseData')
     if ~isa(data{k}.sys,'frd')
         [mag,phase,w] = bode(data{k}.sys,freq*2*pi);
         data{k}.sys = frd(squeeze(mag).*exp(1j*deg2rad(squeeze(phase))),w/2/pi,'FrequencyUnit','Hz');
@@ -159,22 +161,27 @@ end
 end
 
 function pltGain(data,option)
-gain = @(data) mag2db(abs(squeeze(data.sys.ResponseData)));
+gain = @(data) mag2db(abs(squeeze(data.ResponseData)));
 for k = 1:1:length(data)
-    if strcmp(option.foption, 'log')
-        if strcmp(data{k}.style,'')
-            h = scatter(data{k}.sys.frequency,gain(data{k}),'filled','o'); hold on
-            set(h,'MarkerEdgeColor',data{k}.color);
-            set(h,'MarkerFaceColor',data{k}.color);
-            set(gca,'xscale','log');
+    for kk = 1:length(data{k}.sys)
+        if strcmp(option.foption, 'log')
+            if strcmp(data{k}.style,'')
+                h = scatter(data{k}.sys.frequency,gain(data{k}.sys(:,:,kk)),'filled','o'); hold on
+                if ~option.multiFRDcolor
+                    set(h,'MarkerEdgeColor',data{k}.color);
+                    set(h,'MarkerFaceColor',data{k}.color);
+                end
+                set(gca,'xscale','log');
+            else
+                h = semilogx(data{k}.sys.frequency,gain(data{k}.sys(:,:,kk))); hold on;
+                if ~option.multiFRDcolor, try set(h,'Color',data{k}.color); catch, end; end
+                try set(h,'linestyle',data{k}.style); catch, end
+                try set(h,'Marker',data{k}.marker); catch, end
+            end
         else
-            h = semilogx(data{k}.sys.frequency,gain(data{k})); hold on;
-            try set(h,'Color',data{k}.color); catch, end
-            try set(h,'linestyle',data{k}.style); catch, end
-            try set(h,'Marker',data{k}.marker); catch, end
+            h = plot(data{k}.sys.frequency,gain(data{k}.sys(:,:,kk))); hold on;
         end
-    else
-        h = plot(data{k}.sys.frequency,gain(data{k})); hold on;
+        if kk > 1, set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off'); end
     end
 end
 axis([option.fmin, option.fmax, option.gmin, option.gmax]);
@@ -187,32 +194,36 @@ end
 
 function pltPhase(data,option)
 for k = option.phasePlot
-    phasedeg = rad2deg(angle(squeeze(data{k}.sys.ResponseData)));
-    for kk = 1:1:length(phasedeg)
-        while phasedeg(kk) > option.pmax
-            phasedeg(kk) = phasedeg(kk) - 360;
+    for kk = 1:length(data{k}.sys)
+        phasedeg = rad2deg(angle(squeeze(data{k}.sys(:,:,kk).ResponseData)));
+        for kk = 1:1:length(phasedeg)
+            while phasedeg(kk) > option.pmax
+                phasedeg(kk) = phasedeg(kk) - 360;
+            end
+            while phasedeg(kk) < option.pmin
+                phasedeg(kk) = phasedeg(kk) + 360;
+            end
         end
-        while phasedeg(kk) < option.pmin
-            phasedeg(kk) = phasedeg(kk) + 360;
-        end
-    end
-    
-    if strcmp(option.foption, 'log')
-        if strcmp(data{k}.style,'')
-            h = scatter(data{k}.sys.frequency,phasedeg,'filled','o'); hold on
-            set(h,'MarkerEdgeColor',data{k}.color);
-            set(h,'MarkerFaceColor',data{k}.color);
-            set(gca,'xscale','log');
+        
+        if strcmp(option.foption, 'log')
+            if strcmp(data{k}.style,'')
+                h = scatter(data{k}.sys.frequency,phasedeg,'filled','o'); hold on
+                if ~option.multiFRDcolor
+                    set(h,'MarkerEdgeColor',data{k}.color);
+                    set(h,'MarkerFaceColor',data{k}.color);
+                end
+                set(gca,'xscale','log');
+            else
+                h = semilogx(data{k}.sys.frequency,phasedeg); hold on;
+                if ~option.multiFRDcolor, try set(h,'Color',data{k}.color); catch, end; end
+                set(h,'linestyle',data{k}.style);
+                if isfield(data{k},'marker'), set(h,'Marker',data{k}.marker); end
+            end
         else
-            h = semilogx(data{k}.sys.frequency,phasedeg); hold on;
-            set(h,'Color',data{k}.color);
-            set(h,'linestyle',data{k}.style);
-            if isfield(data{k},'marker'), set(h,'Marker',data{k}.marker); end
+            h = plot(data{k}.sys.frequency,phasedeg); hold on;
         end
-    else
-        h = plot(data{k}.sys.frequency,phasedeg); hold on;
+        if kk > 1, set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off'); end
     end
-    
 end
 axis([option.fmin, option.fmax, option.pmin, option.pmax]);
 set(gca,'ytick',option.pmin:option.ptick:option.pmax);
