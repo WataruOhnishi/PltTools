@@ -1,15 +1,16 @@
-function pfig = pltPzmap(sys)
+function pfig = pltPzmap(sys,xRange,yRange)
 %pltPzmap - plot pole zero map
 % pfig = pltPzmap(sys)
 % Author    : Wataru Ohnishi, University of Tokyo, 2014
 %%%%%
 
-
-h = figure;
-pzmap(sys);
-xRange = h.CurrentAxes.XLim;
-yRange = h.CurrentAxes.YLim;
-close(h);
+if nargin < 2
+    h = figure;
+    pzmap(sys);
+    xRange = h.CurrentAxes.XLim;
+    yRange = h.CurrentAxes.YLim;
+    close(h);
+end
 
 pole_sys = pole(sys);
 zero_sys = zero(sys);
