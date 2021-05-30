@@ -21,7 +21,8 @@ function [pfig, hfig, ax] = pltBode(in,option)
 %   option.foption = 'lin'; % freq plot options 'log' or 'lin'
 %   option.Legpos   : legend in gain or phase plot 'gain' or 'phase'
 %   option.title = 'Bode plot'; % title
-%   option.noPhae = false;
+%   option.noPhase = false;
+%   option.noLegend = false;
 %   option.multiFRDcolor = true; % change color for multi frd
 % Author    : Wataru Ohnishi, University of Tokyo, 2017
 %%%%%
@@ -92,6 +93,7 @@ if ~isfield(option,'LegendLoc'), option.LegendLoc = 'best'; end
 if ~isfield(option,'phasePlot'), option.phasePlot = 1:length(data); end
 if ~isfield(option,'freq'), option.freq = logspace(log10(option.fmin),log10(option.fmax),1000); end
 if ~isfield(option,'noPhase'), option.noPhase = false; end
+if ~isfield(option,'noLegend'), option.noLegend = false; end
 if ~isfield(option,'multiFRDcolor'), option.multiFRDcolor = false; end
 end
 
@@ -188,7 +190,7 @@ end
 axis([option.fmin, option.fmax, option.gmin, option.gmax]);
 set(gca,'ytick',option.gmin:option.gtick:option.gmax);
 ylabel('Magnitude [dB]');
-if strcmp(option.Legpos,'gain'), multiLegend(data); end
+if strcmp(option.Legpos,'gain') && ~option.noLegend, multiLegend(data); end
 grid on; hold on;
 if isfield(option,'title'), title(option.title); end
 end
@@ -229,6 +231,6 @@ end
 axis([option.fmin, option.fmax, option.pmin, option.pmax]);
 set(gca,'ytick',option.pmin:option.ptick:option.pmax);
 ylabel('Phase [deg]');
-if strcmp(option.Legpos,'phase'), multiLegend(data); end
+if strcmp(option.Legpos,'phase') && ~option.noLegend, multiLegend(data); end
 grid on;
 end
