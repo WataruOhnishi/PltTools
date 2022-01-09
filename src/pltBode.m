@@ -44,12 +44,16 @@ option = findGainRange(data,option);
 ax = nan;
 hfig = figure;
 if ~option.noPhase
-    ax(1) = subplot(2,1,1);
+    t = tiledlayout(2,1);
+    ax(1) = nexttile;
     pltGain(data,option);
     
-    ax(2) = subplot(2,1,2);
+    ax(2) = nexttile;
     pltPhase(data,option);
     linkaxes(ax,'x');
+    
+    t.TileSpacing = 'compact';
+    t.Padding = 'compact';
 else
     pltGain(data,option);
 end
